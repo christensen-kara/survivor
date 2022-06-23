@@ -3,6 +3,29 @@ from bs4 import BeautifulSoup
 
 import pandas as pd
 
+
+def makePersonList(name, season, person):
+	# Create the list for each person to append to the main list
+	entry = []
+
+	# Get the persons name and add to list
+	entry.append(name)
+
+	# Add season number to list
+	entry.append(season)
+
+	# Add url to list
+	bioURL = baseURL + person['href']
+
+	# bioData = requests.get(bioURL)
+	# bioHtml = BeautifulSoup(bioData.text, 'html.parser')
+
+	# Add url to list
+	entry.append(bioURL)
+
+	return entry
+
+
 url = 'https://www.cbs.com/shows/survivor/cast/'
 
 baseURL = 'https://www.cbs.com'
@@ -32,75 +55,33 @@ for season in range(1, numSeasons + 1):
 		# Make sure its not Jeff Probst
 		name = str.strip(person.find('div', class_ = 'title').contents[0])
 
-		if 'Jeff Probst' not in name:
+
+		# Remove mentors and some Jeffs
+		meta = ''
+
+		try:
+			meta = person.find(class_ = 'meta-gray').contents[0].strip()
+		except AttributeError:
+			pass
+
+
+		if (meta != 'Mentor') and 'Jeff Probst' not in name:
 			if ' & ' in name:
 				names = name.split(' & ')
 
 				for name in names:
-					# Create the list for each person to append to the main list
-					entry = []
 
-					# Get the persons name and add to list
-					entry.append(name)
-
-					# Add season number to list
-					entry.append(season)
-
-					# Add url to list
-					bioURL = baseURL + person['href']
-
-					# bioData = requests.get(bioURL)
-					# bioHtml = BeautifulSoup(bioData.text, 'html.parser')
-
-					# Add url to list
-					entry.append(bioURL)
-
-					allCast.append(entry)
+					allCast.append(makePersonList(name, season, person))
 
 			elif ' and ' in name:
 				names = name.split(' and ')
 
 				for name in names:
-					# Create the list for each person to append to the main list
-					entry = []
-
-					# Get the persons name and add to list
-					entry.append(name)
-
-					# Add season number to list
-					entry.append(season)
-
-					# Add url to list
-					bioURL = baseURL + person['href']
-
-					# bioData = requests.get(bioURL)
-					# bioHtml = BeautifulSoup(bioData.text, 'html.parser')
-
-					# Add url to list
-					entry.append(bioURL)
-
-					allCast.append(entry)
+					allCast.append(makePersonList(name, season, person))
 
 			else:
-				# Create the list for each person to append to the main list
-				entry = []
 
-				# Get the persons name and add to list
-				entry.append(name)
-
-				# Add season number to list
-				entry.append(season)
-
-				# Add url to list
-				bioURL = baseURL + person['href']
-
-				# bioData = requests.get(bioURL)
-				# bioHtml = BeautifulSoup(bioData.text, 'html.parser')
-
-				# Add url to list
-				entry.append(bioURL)
-
-				allCast.append(entry)
+				allCast.append(makePersonList(name, season, person))
 
 
 df = pd.DataFrame(allCast, columns=['Name', 'Season Number', 'Link to Bio'])
