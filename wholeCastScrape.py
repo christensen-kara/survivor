@@ -55,6 +55,7 @@ for season in range(1, numSeasons + 1):
 		# Make sure its not Jeff Probst
 		name = str.strip(person.find('div', class_ = 'title').contents[0])
 
+
 		# Remove mentors and some Jeffs
 		meta = ''
 
