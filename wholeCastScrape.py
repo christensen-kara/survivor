@@ -26,21 +26,30 @@ for season in range(1, numSeasons + 1):
 	castList = seasonHtml.find('div', class_ = 'grid-view-container').findAll('a')
 
 	for person in castList:
-		# Create the list for each person to append to the main list
-		entry = []
+		# Make sure its not Jeff Probst
+		name = str.strip(person.find('div', class_ = 'title').contents[0])
 
-		# Get the persons name and add to list
-		entry.append(str.strip(person.find('span').contents[0]))
+		if name != 'Jeff Probst':
+			# Create the list for each person to append to the main list
+			entry = []
 
-		# Add season number to list
-		entry.append(season)
+			# Get the persons name and add to list
+			entry.append(name)
 
-		# Add url to list
-		entry.append(baseURL + person['href'])
+			# Add season number to list
+			entry.append(season)
 
-		allCast.append(entry)
+			# Add url to list
+			bioURL = baseURL + person['href']
+
+			# bioData = requests.get(bioURL)
+			# bioHtml = BeautifulSoup(bioData.text, 'html.parser')
+
+			# Add url to list
+			entry.append(bioURL)
+
+			allCast.append(entry)
 
 
 df = pd.DataFrame(allCast, columns=['Name', 'Season Number', 'Link to Bio'])
- 
 df.to_csv('nameSeasonBio.csv', index=False)
