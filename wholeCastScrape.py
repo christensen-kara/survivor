@@ -20,8 +20,8 @@ for season in range(1, numSeasons + 1):
 
 	seasonUrl = url + 'season/' + str(season) + '/'
 
-	seasonData = requests.get(url)
-	seasonHtml = BeautifulSoup(data.text, 'html.parser')
+	seasonData = requests.get(seasonUrl)
+	seasonHtml = BeautifulSoup(seasonData.text, 'html.parser')
 
 	castList = seasonHtml.find('div', class_ = 'grid-view-container').findAll('a')
 
