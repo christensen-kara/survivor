@@ -2,9 +2,10 @@ import requests
 from bs4 import BeautifulSoup
 
 import pandas as pd
+import re
 
 
-def makePersonList(name, season, person):
+def makePersonList(name, season, person, half):
 	# Create the list for each person to append to the main list
 	entry = []
 
@@ -17,11 +18,36 @@ def makePersonList(name, season, person):
 	# Add url to list
 	bioURL = baseURL + person['href']
 
-	# bioData = requests.get(bioURL)
-	# bioHtml = BeautifulSoup(bioData.text, 'html.parser')
+	bioData = requests.get(bioURL)
+	bioHtml = BeautifulSoup(bioData.text, 'html.parser')
 
-	# Add url to list
-	entry.append(bioURL)
+
+	## WORKING ON THIS paRT< nEed to clean the text and split for blood vs water seasons
+	bioContent = bioHtml.find(class_ = 'cast-bio')
+
+
+	if half == 0: # They are not part of a pair
+		# Add url to list
+		entry.append(bioContent)
+	elif half == 1: # they are the first half of a pair
+		split_string = re.split(r'<strong>Name:</strong>|<strong>Name \(Age\):</strong>|<strong>Name \(Age\)</strong>:|<strong>Name</strong>:|<strong>Name \(Age\): </strong>|<strong>Name: </strong>', str(bioContent))
+
+		print(len(split_string), season)
+
+		for string in split_string:
+			print(string)
+
+		entry.append(split_string[1])
+
+	elif half == 2: # they are the second half of a pair
+		split_string = re.split(r'<strong>Name:</strong>|<strong>Name \(Age\):</strong>|<strong>Name \(Age\)</strong>:|<strong>Name</strong>:|<strong>Name \(Age\): </strong>|<strong>Name: </strong>', str(bioContent))
+
+		print(len(split_string), season)
+
+		for string in split_string:
+			print(string)
+
+		entry.append(split_string[2])
 
 	return entry
 
@@ -55,7 +81,6 @@ for season in range(1, numSeasons + 1):
 		# Make sure its not Jeff Probst
 		name = str.strip(person.find('div', class_ = 'title').contents[0])
 
-
 		# Remove mentors and some Jeffs
 		meta = ''
 
@@ -65,23 +90,32 @@ for season in range(1, numSeasons + 1):
 			pass
 
 
+
 		if (meta != 'Mentor') and 'Jeff Probst' not in name:
+
+			half = 0
+
 			if ' & ' in name:
 				names = name.split(' & ')
 
-				for name in names:
 
-					allCast.append(makePersonList(name, season, person))
+
+				for name in names:
+					half += 1
+
+					allCast.append(makePersonList(name, season, person, half))
 
 			elif ' and ' in name:
 				names = name.split(' and ')
 
 				for name in names:
-					allCast.append(makePersonList(name, season, person))
+					half += 1
+
+					allCast.append(makePersonList(name, season, person, half))
 
 			else:
 
-				allCast.append(makePersonList(name, season, person))
+				allCast.append(makePersonList(name, season, person, half))
 
 
 df = pd.DataFrame(allCast, columns=['Name', 'Season Number', 'Link to Bio'])
