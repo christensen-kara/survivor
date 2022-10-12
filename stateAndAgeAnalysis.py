@@ -190,12 +190,12 @@ def my_autopct(pct):
 	"""
 	return ('%.2f' % pct) if pct > 3 else ''
 
-
-user = 'kara'
-password = 'blissandtea'
-host = 'survivordata.cqkafyjivuwe.us-east-1.rds.amazonaws.com'
+# Replace these wth your credentials
+user = 'USERNAME'
+password = 'PASSWORD'
+host = 'HOST'
 port = '5432'
-database = 'postgres'
+database = 'DATABASE'
 
 engine = create_engine(name_or_url = 'postgresql://' + user + ':' + password + '@' + host + ':' + port + '/' + database)
 contestants = pd.read_sql_table('allContestants', engine, schema = 'overall')
